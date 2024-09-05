@@ -1,0 +1,10 @@
+{% load absoluteuri %}{% spaceless %}
+{% if ENVIRONMENT == 'production' %}
+User-agent: *
+Disallow: /admin/
+{% url 'sitemap' as sitemap_url %}{% if sitemap_url %}Sitemap: {{ sitemap_url|absolutize }}{% endif %}
+{% else %}
+User-agent: *
+Disallow: /
+{% endif %}
+{% endspaceless %}

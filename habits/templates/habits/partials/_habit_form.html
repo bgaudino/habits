@@ -1,0 +1,8 @@
+<form id="add-form"
+      hx-post="{% url 'habit_create' %}"
+      hx-target="#habit-list"
+      hx-select="#habit-list"
+      hx-swap="outerHTML">
+  {% csrf_token %}
+  <span id="form">{{ habit_form }}</span>
+</form>

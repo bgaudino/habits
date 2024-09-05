@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Habits</h1>
+  <style>
+  .w-100 {
+    width: 100%;
+  }
+  .fit-content {
+    width: fit-content !important;
+  }
+  </style>
+  <div x-data="{ open: false }">
+    <article>
+      <div class="grid">
+        {{ date_form.date }}
+        <div>
+          <button class="w-100" @click="open = true">Add</button>
+        </div>
+      </div>
+    </article>
+    <script>flatpickr('#id_date', {maxDate: new Date()});</script>
+    <div id="habit-list">
+      <dialog :open="open" x-init="open = false">
+        <article>
+          <h2>Add a Habit</h2>
+          {% include 'habits/partials/_habit_form.html' with habit_form=habit_form %}
+          <footer>
+            <button class="secondary" @click="open = false">Cancel</button>
+            <button class="fit-content" type="submit">Confirm</button>
+          </footer>
+        </article>
+      </dialog>
+      {% for habit in object_list %}
+        {% include 'habits/partials/_habit.html' with habit=habit %}
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

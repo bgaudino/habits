@@ -1,0 +1,6 @@
+dj-database-url
+django-authtools
+django-extensions
+django
+psycopg2
+python-dotenv

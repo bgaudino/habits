@@ -1,0 +1,12 @@
+<article id="habit-{{ habit.pk }}">
+  <input type="checkbox"
+         {% if habit.is_completed %}checked{% endif %}
+         hx-post="{% url 'toggle_completion' habit.pk date %}"
+         hx-target="#habit-{{ habit.pk }}"
+         hx-swap="outerHTML"
+         hx-include="[name='csrfmiddlewaretoken']">
+  {{ habit.name }}
+  <footer>
+    {{ habit.streak_text }}
+  </footer>
+</article>
