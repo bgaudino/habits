@@ -9,6 +9,9 @@ from .settings import *
 
 DEBUG = False
 
+ALLOWED_HOSTS = ['habit.fly.dev']
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 
 CSRF_COOKIE_SECURE = True
