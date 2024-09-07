@@ -20,6 +20,7 @@ urlpatterns = [
     ),
     path('admin/', admin.site.urls),
     path('', views.HabitListView.as_view(), name='habit_list'),
+    path('<int:pk>/', views.HabitDetailView.as_view(), name='habit_detail'),
     path('create/', views.HabitCreateView.as_view(), name='habit_create'),
     path(
         'complete/<int:pk>/<date:date>/',

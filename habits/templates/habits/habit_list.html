@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h1>Habits</h1>
   <style>
   .w-100 {
     width: 100%;
@@ -18,7 +17,7 @@
         </div>
       </div>
     </article>
-    <script>flatpickr('#id_date', {maxDate: new Date()});</script>
+    <script>document.addEventListener('DOMContentLoaded', () => flatpickr('#id_date', {maxDate: new Date()}));</script>
     <div id="habit-list">
       <dialog :open="open" x-init="open = false">
         <article>

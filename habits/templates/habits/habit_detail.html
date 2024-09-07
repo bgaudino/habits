@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+  <article>
+    <header>
+      <h2>{{ object.name }}</h2>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <td>Week</td>
+          <td>Month</td>
+          <td>Year</td>
+          <td>Longest Streak</td>
+          <td>Current Streak</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ object.stats.week.completions }} / {{ object.stats.week.days }}</td>
+          <td>{{ object.stats.month.completions }} / {{ object.stats.month.days }}</td>
+          <td>{{ object.stats.year.completions }} / {{ object.stats.year.days }}</td>
+          <td>{{ object.stats.longest_streak }}</td>
+          <td>{{ object.streak_info.0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <footer>
+      <a href="{% url 'habit_list' %}">Back</a>
+    </footer>
+  </article>
+{% endblock %}

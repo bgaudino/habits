@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, View, CreateView
+from django.views.generic import ListView, View, CreateView, DetailView
 
 from .forms import DateForm, HabitForm
 from .models import Habit
@@ -88,3 +88,8 @@ class HabitCreateView(LoginRequiredMixin, CreateView):
             if query:
                 url += f'?{query}'
         return url
+
+
+class HabitDetailView(LoginRequiredMixin, DetailView):
+    def get_queryset(self):
+        return self.request.user.habit_set

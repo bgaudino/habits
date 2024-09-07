@@ -5,7 +5,7 @@
          hx-target="#habit-{{ habit.pk }}"
          hx-swap="outerHTML"
          hx-include="[name='csrfmiddlewaretoken']">
-  {{ habit.name }}
+  <a href="{% url 'habit_detail' habit.pk %}">{{ habit.name }}</a>
   <footer>
     {{ habit.streak_text }}
   </footer>

@@ -32,6 +32,8 @@ class Habit(models.Model):
 
     objects = HabitQuerySet.as_manager()
 
+    periods = (('year', 365), ('month', 30), ('week', 7))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not hasattr(self, 'is_completed'):
@@ -93,6 +95,36 @@ class Habit(models.Model):
             streak += 1
             date -= timezone.timedelta(days=1)
         return streak, on_the_line
+
+    @cached_property
+    def stats(self):
+        stats = {p: {'completions': 0, 'days': d} for p, d in self.periods}
+        today = timezone.localdate()
+        days_since_first_completion = 0
+        streaks = []
+        streak = 0
+        last_delta = None
+        for i, completion in enumerate(self.completion_set.all(), 1):
+            delta = today - completion.date
+            if last_delta is None or last_delta.days == delta.days - 1:
+                streak += 1
+            else:
+                streaks.append(streak)
+                streak = 1
+            for period, days in self.periods:
+                if delta <= timezone.timedelta(days=days):
+                    stats[period]['completions'] = i
+            days_since_first_completion = delta.days
+            last_delta = delta
+        if streak:
+            streaks.append(streak)
+        print(streaks)
+        days_since_creation = (today - self.date_created).days
+        total_days = max(days_since_creation, days_since_first_completion)
+        for period, days in self.periods:
+            stats[period]['days'] = min(stats[period]['days'], total_days)
+        stats['longest_streak'] = max(streaks) if streaks else 0
+        return stats
 
 
 class Completion(models.Model):
