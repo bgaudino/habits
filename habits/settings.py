@@ -99,7 +99,7 @@ LANGUAGE_CODE = 'en-us'
 
 USE_I18N = True
 USE_TZ = True
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Chicago'
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
