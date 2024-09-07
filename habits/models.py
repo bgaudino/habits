@@ -120,7 +120,7 @@ class Habit(models.Model):
             streaks.append(streak)
         print(streaks)
         days_since_creation = (today - self.date_created).days
-        total_days = max(days_since_creation, days_since_first_completion)
+        total_days = max(days_since_creation, days_since_first_completion + 1)
         for period, days in self.periods:
             stats[period]['days'] = min(stats[period]['days'], total_days)
         stats['longest_streak'] = max(streaks) if streaks else 0
