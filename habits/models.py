@@ -68,9 +68,9 @@ class Habit(models.Model):
         streak, on_the_line = self.streak_info
         if streak:
             if on_the_line:
-                return f'{streak} day streak on the line!'
+                return f'⏳ {streak} day streak on the line!'
             return f'🎉 {streak} day{"s" if streak > 1 else ""} and counting!'
-        return 'Start a new streak!'
+        return '🌱 Start a new streak!'
 
     @cached_property
     def streak_info(self):
@@ -103,9 +103,16 @@ class Habit(models.Model):
         days_since_first_completion = 0
         streaks = []
         streak = 0
+        on_streak = False
         last_delta = None
-        for i, completion in enumerate(self.completion_set.all(), 1):
+        completed_today = False
+        completions = self.completion_set.filter(date__lte=today)
+        for i, completion in enumerate(completions):
             delta = today - completion.date
+            if delta.days <= 1:
+                on_streak = True
+                if delta.days == 0:
+                    completed_today = True
             if last_delta is None or last_delta.days == delta.days - 1:
                 streak += 1
             else:
@@ -118,12 +125,14 @@ class Habit(models.Model):
             last_delta = delta
         if streak:
             streaks.append(streak)
-        print(streaks)
         days_since_creation = (today - self.date_created).days
         total_days = max(days_since_creation, days_since_first_completion + 1)
         for period, days in self.periods:
             stats[period]['days'] = min(stats[period]['days'], total_days)
         stats['longest_streak'] = max(streaks) if streaks else 0
+        stats['current_streak'] = streaks[0] if on_streak else 0
+        stats['on_streak'] = on_streak
+        stats['completed_today'] = completed_today
         return stats
 
 
