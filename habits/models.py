@@ -107,7 +107,7 @@ class Habit(models.Model):
         last_delta = None
         completed_today = False
         completions = self.completion_set.filter(date__lte=today)
-        for i, completion in enumerate(completions):
+        for i, completion in enumerate(completions, 1):
             delta = today - completion.date
             if delta.days <= 1:
                 on_streak = True
