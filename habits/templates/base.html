@@ -35,12 +35,20 @@
           <li>
             <a href="{% url 'habit_list' %}">My Habits</a>
           </li>
-          <li>
-            <a href="https://half-empty.fly.dev/">Half Empty</a>
-          </li>
-          <li>
-            <a href="{% url 'admin:index' %}">Admin</a>
-          </li>
+          <details class="dropdown">
+            <summary>Menu</summary>
+            <ul dir="rtl">
+              <li>
+                <a href="{% url 'admin:index' %}">Admin</a>
+              </li>
+              <li>
+                <a href="https://half-empty.fly.dev/" target="_blank">Todos</a>
+              </li>
+              <li>
+                <a href="https://brian-works-out.netlify.app/" target="_blank">Workouts</a>
+              </li>
+            </ul>
+          </details>
         </ul>
       </nav>
       {% block content %}
