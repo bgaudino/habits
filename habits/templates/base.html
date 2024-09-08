@@ -22,8 +22,17 @@
           href="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.css">
   </head>
   <body>
+    <header>
+    </header>
     <main class="container">
-      <h1>Habits</h1>
+      <nav>
+        <ul><li><h1>Habits</h1></li></ul>
+        <ul>
+          <li><a href="{% url 'habit_list' %}">My Habits</a></li>
+          <li><a href="https://half-empty.fly.dev/">Half Empty</a></li>
+          <li><a href="{% url 'admin:index' %}">Admin</a></li>
+        </ul>
+      </nav>
       {% block content %}
       {% endblock content %}
     </main>
