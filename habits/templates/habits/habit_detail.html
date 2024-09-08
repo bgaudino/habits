@@ -7,7 +7,9 @@
     <p>
       {% if object.stats.on_streak %}
         {% if object.stats.completed_today %}
-          🎉 Congratulations! You're streak is {{ object.stats.current_streak }} day{% if object.stats.current_streak > 1 %}s{% endif %} and counting.
+          🎉 Congratulations! You're streak is {{ object.stats.current_streak }} day
+          {% if object.stats.current_streak > 1 %}s{% endif %}
+          and counting.
         {% else %}
           ⏳ Your {{ object.stats.current_streak }} day streak is on the line!
         {% endif %}

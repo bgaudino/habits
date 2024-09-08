@@ -7,15 +7,31 @@
   .fit-content {
     width: fit-content !important;
   }
+  .space-between {
+    display: flex;
+    justify-content: space-between;
+  }
+  .baseline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
   </style>
   <div x-data="{ open: false }">
     <article>
-      <div class="grid">
-        {{ date_form.date }}
-        <div>
-          <button class="w-100" @click="open = true">Add</button>
+      {{ date_form }}
+      <footer class="space-between">
+        <div class="baseline">
+          <a href="{% url 'habit_list' %}?date={{ prev_date|date:"Y-m-d" }}"><<</a>
+          {% if next_date %}
+            <a href="{% url 'habit_list' %}?date={{ next_date|date:"Y-m-d" }}">>></a>
+            <a href="{% url 'habit_list' %}">Today</a>
+          {% endif %}
         </div>
-      </div>
+        <div>
+          <button @click="open = true">Add</button>
+        </div>
+      </footer>
     </article>
     <script>document.addEventListener('DOMContentLoaded', () => flatpickr('#id_date', {maxDate: new Date()}));</script>
     <div id="habit-list">

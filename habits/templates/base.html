@@ -26,11 +26,21 @@
     </header>
     <main class="container">
       <nav>
-        <ul><li><h1>Habits</h1></li></ul>
         <ul>
-          <li><a href="{% url 'habit_list' %}">My Habits</a></li>
-          <li><a href="https://half-empty.fly.dev/">Half Empty</a></li>
-          <li><a href="{% url 'admin:index' %}">Admin</a></li>
+          <li>
+            <h1>Habits</h1>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a href="{% url 'habit_list' %}">My Habits</a>
+          </li>
+          <li>
+            <a href="https://half-empty.fly.dev/">Half Empty</a>
+          </li>
+          <li>
+            <a href="{% url 'admin:index' %}">Admin</a>
+          </li>
         </ul>
       </nav>
       {% block content %}
