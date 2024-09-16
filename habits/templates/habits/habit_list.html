@@ -20,7 +20,7 @@
   <div x-data="{ open: false }">
     <article>
       {{ date_form }}
-      <footer class="space-between">
+      <footer id="date-buttons" hx-swap-oob="true" class="space-between">
         <div class="baseline">
           <a href="{% url 'habit_list' %}?date={{ prev_date|date:"Y-m-d" }}"><<</a>
           {% if next_date %}
