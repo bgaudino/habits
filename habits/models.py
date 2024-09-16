@@ -106,13 +106,13 @@ class Habit(models.Model):
         for completion in self.completion_set.all():
             current_date = completion.date
             delta = (last_date - current_date).days
-            for period, days in self.periods:
-                if 0 <= (yesterday - current_date).days <= days:
-                    stats[period]['completions'] += 1
             if current_date == today:
                 completed_today = True
                 continue
-            elif current_date == yesterday:
+            for period, days in self.periods:
+                if 0 <= (yesterday - current_date).days <= days:
+                    stats[period]['completions'] += 1
+            if current_date == yesterday:
                 completed_yesterday = True
                 win_streak = 1
                 continue
