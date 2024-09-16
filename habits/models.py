@@ -105,10 +105,10 @@ class Habit(models.Model):
         last_date = yesterday
         for completion in self.completion_set.all():
             current_date = completion.date
-            delta = (last_date - current_date).days
             if current_date == today:
                 completed_today = True
                 continue
+            delta = (last_date - current_date).days
             for period, days in self.periods:
                 if 0 <= (yesterday - current_date).days <= days:
                     stats[period]['completions'] += 1
