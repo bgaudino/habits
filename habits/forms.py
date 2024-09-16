@@ -18,6 +18,18 @@ class DateForm(forms.Form):
 
 
 class HabitForm(forms.ModelForm):
+    is_bad = forms.BooleanField(
+        widget=forms.RadioSelect(
+            choices=(
+                ('', 'Good'),
+                ('on', 'Bad'),
+            )
+        ),
+        label='Type',
+        required=False,
+        initial='',
+    )
+
     class Meta:
         model = models.Habit
-        fields = ['name']
+        fields = ['name', 'is_bad']

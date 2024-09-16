@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class HabitQuerySet(models.QuerySet):
-    def with_streak_info(self, date):
+    def with_completion_status(self, date):
         return self.prefetch_related(
             models.Prefetch(
                 'completion_set',
@@ -29,6 +29,7 @@ class Habit(models.Model):
     )
     name = models.CharField(max_length=255, unique=True)
     date_created = models.DateField(auto_now_add=True)
+    is_bad = models.BooleanField(default=False)
 
     objects = HabitQuerySet.as_manager()
 
@@ -61,24 +62,111 @@ class Habit(models.Model):
     def _is_completed(self, date):
         return self.completion_set.filter(date=date).exists()
 
+    @property
+    def streaks(self):
+        return self.stats['loss_streaks'] if self.is_bad else self.stats['win_streaks']
+
+    @property
     def current_streak(self):
-        return self.streak_info[0]
+        if hasattr(self, 'stats'):
+            return self.stats['current_streak']
+        return self.quick_stats[0]
+
+    @property
+    def longest_streak(self):
+        return max(self.streaks)
+
+    @property
+    def completed_today(self):
+        if hasattr(self, 'stats'):
+            return self.stats['completed_today']
+        return self.quick_stats[1]
 
     def streak_text(self):
-        streak, on_the_line = self.streak_info
-        if streak:
-            if on_the_line:
-                return f'⏳ {streak} day streak on the line!'
-            return f'🎉 {streak} day{"s" if streak > 1 else ""} and counting!'
-        return '🌱 Start a new streak!'
+        if self.current_streak == 0:
+            return '🌱 Start a new streak!'
+        elif self.completed_today:
+            return f'🎉 {self.current_streak} day{"s" if self.current_streak > 1 else ""} and counting!'
+        else:
+            return f'⏳ {self.current_streak} day streak on the line!'
 
     @cached_property
-    def streak_info(self):
+    def stats(self):
+        stats = {p: {'completions': 0, 'days': d} for p, d in self.periods}
+        today = timezone.localdate()
+        yesterday = today - timezone.timedelta(days=1)
+        completed_streaks = []
+        missed_streaks = []
+        win_streak = 0
+        completed_today = False
+        completed_yesterday = False
+        last_date = yesterday
+        for completion in self.completion_set.all():
+            current_date = completion.date
+            delta = (last_date - current_date).days
+            for period, days in self.periods:
+                if (yesterday - current_date).days <= days:
+                    stats[period]['completions'] += 1
+            if current_date == today:
+                completed_today = True
+                continue
+            elif current_date == yesterday:
+                completed_yesterday = True
+                win_streak = 1
+                continue
+            elif delta == 1 and (completed_yesterday or last_date != yesterday):
+                win_streak += 1
+            else:
+                if last_date == yesterday and not completed_yesterday:
+                    missed_streaks.append(delta)
+                else:
+                    missed_streaks.append(delta - 1)
+                completed_streaks.append(win_streak)
+                win_streak = 1
+            last_date = current_date
+        if win_streak:
+            completed_streaks.append(win_streak)
+        start_date = min(self.date_created, last_date)
+        delta = (last_date - start_date).days
+        if delta > 1:
+            missed_streaks.append(delta)
+        total_days = (yesterday - start_date).days
+        for period, days in self.periods:
+            stats[period]['days'] = min(days, total_days)
+        stats['win_streaks'] = completed_streaks
+        stats['loss_streaks'] = missed_streaks
+        stats['completed_today'] = completed_today
+        stats['completed_yesterday'] = completed_yesterday
+        current_streak = 0
+        if self.is_bad:
+            if not completed_today or completed_yesterday:
+                current_streak = missed_streaks[0] if missed_streaks else 0
+        else:
+            if completed_today:
+                if completed_yesterday:
+                    completed_streaks[0] += 1
+                else:
+                    completed_streaks.insert(0, 1)
+                current_streak = completed_streaks[0]
+            elif completed_yesterday:
+                current_streak = completed_streaks[0]
+        stats['current_streak'] = current_streak
+        return stats
+
+    @cached_property
+    def quick_stats(self):
         streak = 0
         date = today = timezone.localdate()
-        on_the_line = True
+        completion = self.completion_set.first()
+        completed_today = completion and completion.date == today
+        if self.is_bad:
+            start = completion.date if completion else self.date_created
+            streak = (today - start).days
+            return streak - 1, completed_today
+
         last_date = None
         for completion in self.completion_set.all():
+            start = completion.date
             if completion.date > today:
                 continue
             if last_date == completion.date:
@@ -87,53 +175,13 @@ class Habit(models.Model):
             if date == today:
                 date -= timezone.timedelta(days=1)
                 if completion.date == today:
-                    on_the_line = False
                     streak += 1
                     continue
             if completion.date != date:
                 break
             streak += 1
             date -= timezone.timedelta(days=1)
-        return streak, on_the_line
-
-    @cached_property
-    def stats(self):
-        stats = {p: {'completions': 0, 'days': d} for p, d in self.periods}
-        today = timezone.localdate()
-        days_since_first_completion = 0
-        streaks = []
-        streak = 0
-        on_streak = False
-        last_delta = None
-        completed_today = False
-        completions = self.completion_set.filter(date__lte=today)
-        for i, completion in enumerate(completions, 1):
-            delta = today - completion.date
-            if delta.days <= 1:
-                on_streak = True
-                if delta.days == 0:
-                    completed_today = True
-            if last_delta is None or last_delta.days == delta.days - 1:
-                streak += 1
-            else:
-                streaks.append(streak)
-                streak = 1
-            for period, days in self.periods:
-                if delta <= timezone.timedelta(days=days):
-                    stats[period]['completions'] = i
-            days_since_first_completion = delta.days
-            last_delta = delta
-        if streak:
-            streaks.append(streak)
-        days_since_creation = (today - self.date_created).days
-        total_days = max(days_since_creation, days_since_first_completion + 1)
-        for period, days in self.periods:
-            stats[period]['days'] = min(stats[period]['days'], total_days)
-        stats['longest_streak'] = max(streaks) if streaks else 0
-        stats['current_streak'] = streaks[0] if on_streak else 0
-        stats['on_streak'] = on_streak
-        stats['completed_today'] = completed_today
-        return stats
+        return streak, completed_today
 
 
 class Completion(models.Model):

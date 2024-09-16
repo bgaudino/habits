@@ -45,8 +45,12 @@
           </footer>
         </article>
       </dialog>
-      {% for habit in object_list %}
-        {% include 'habits/partials/_habit.html' with habit=habit %}
+      {% regroup object_list|dictsort:"is_bad" by is_bad as groups %}
+      {% for group in groups %}
+        <h2>{% if group.grouper %}Bad{% else %}Good{% endif %} Habits</h2>
+        {% for habit in group.list %}
+          {% include 'habits/partials/_habit.html' with habit=habit %}
+        {% endfor %}
       {% endfor %}
     </div>
   </div>

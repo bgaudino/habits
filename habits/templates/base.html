@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
-<html x-data="{ 'theme': localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') }" :data-theme="theme">
+<html x-data="{ 'theme': localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') }"
+      :data-theme="theme">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,9 +37,10 @@
             <a href="{% url 'habit_list' %}">My Habits</a>
           </li>
           <li>
-            <button class="outline" @click="theme = theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', theme)">
+            <button class="outline"
+                    @click="theme = theme === 'light' ? 'dark' : 'light'; localStorage.setItem('theme', theme)">
               <span x-show="theme === 'dark'" aria-label="Turn off dark mode">🌙</span>
-              <span x-show="theme === 'light'" aria-label="Turn on dark mode">☀️</span>
+              <span x-show="theme !== 'dark'" aria-label="Turn on dark mode">☀️</span>
             </button>
           </li>
           <details class="dropdown">

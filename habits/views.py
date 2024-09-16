@@ -29,7 +29,7 @@ class HabitListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Habit.objects.filter(
             user=self.request.user
-        ).with_streak_info(self.date)
+        ).with_completion_status(self.date)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,7 +45,7 @@ class HabitListView(LoginRequiredMixin, ListView):
 class ToggleCompletionView(LoginRequiredMixin, View):
     def get_habit(self):
         return get_object_or_404(
-            self.request.user.habit_set.with_streak_info(self.kwargs['date']),
+            self.request.user.habit_set.with_completion_status(self.kwargs['date']),
             pk=self.kwargs['pk'],
         )
 

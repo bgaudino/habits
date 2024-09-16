@@ -4,19 +4,7 @@
     <header>
       <h2>{{ object.name }}</h2>
     </header>
-    <p>
-      {% if object.stats.on_streak %}
-        {% if object.stats.completed_today %}
-          🎉 Congratulations! You're streak is {{ object.stats.current_streak }} day
-          {% if object.stats.current_streak > 1 %}s{% endif %}
-          and counting.
-        {% else %}
-          ⏳ Your {{ object.stats.current_streak }} day streak is on the line!
-        {% endif %}
-      {% else %}
-        🌱 Complete this habit to start a new streak
-      {% endif %}
-    </p>
+    <p>{{ object.streak_text }}</p>
     <table>
       <thead>
         <tr>
@@ -32,8 +20,8 @@
           <td>{{ object.stats.week.completions }} / {{ object.stats.week.days }}</td>
           <td>{{ object.stats.month.completions }} / {{ object.stats.month.days }}</td>
           <td>{{ object.stats.year.completions }} / {{ object.stats.year.days }}</td>
-          <td>{{ object.stats.longest_streak }}</td>
-          <td>{{ object.stats.current_streak }}</td>
+          <td>{{ object.longest_streak }}</td>
+          <td>{{ object.current_streak }}</td>
         </tr>
       </tbody>
     </table>
