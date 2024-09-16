@@ -74,7 +74,7 @@ class Habit(models.Model):
 
     @property
     def longest_streak(self):
-        return max(self.streaks)
+        return max(self.streaks) if self.streaks else 0
 
     @property
     def completed_today(self):
@@ -84,6 +84,8 @@ class Habit(models.Model):
 
     def streak_text(self):
         if self.current_streak == 0:
+            if self.is_bad and self.completed_today:
+                return '🌅 Tomorrow is a new day'
             return '🌱 Start a new streak!'
         elif self.completed_today:
             return f'🎉 {self.current_streak} day{"s" if self.current_streak > 1 else ""} and counting!'
@@ -105,7 +107,7 @@ class Habit(models.Model):
             current_date = completion.date
             delta = (last_date - current_date).days
             for period, days in self.periods:
-                if (yesterday - current_date).days <= days:
+                if 0 <= (yesterday - current_date).days <= days:
                     stats[period]['completions'] += 1
             if current_date == today:
                 completed_today = True
