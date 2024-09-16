@@ -132,7 +132,7 @@ class Habit(models.Model):
         delta = (last_date - start_date).days
         if delta > 1:
             missed_streaks.append(delta)
-        total_days = (yesterday - start_date).days
+        total_days = (yesterday - start_date).days + 1
         for period, days in self.periods:
             stats[period]['days'] = min(days, total_days)
         stats['win_streaks'] = completed_streaks
