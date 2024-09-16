@@ -110,7 +110,7 @@ class Habit(models.Model):
                 continue
             delta = (last_date - current_date).days
             for period, days in self.periods:
-                if 0 <= (yesterday - current_date).days <= days:
+                if 0 <= (yesterday - current_date).days < days:
                     stats[period]['completions'] += 1
             if current_date == yesterday:
                 completed_yesterday = True
