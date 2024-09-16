@@ -8,18 +8,30 @@
     <table>
       <thead>
         <tr>
-          <td>Week</td>
-          <td>Month</td>
-          <td>Year</td>
-          <td>Longest Streak</td>
-          <td>Current Streak</td>
+          <th>Today</th>
+          <th>Week</th>
+          <th>Month</th>
+          <th>Year</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>{{ object.stats.week.completions }} / {{ object.stats.week.days }}</td>
-          <td>{{ object.stats.month.completions }} / {{ object.stats.month.days }}</td>
-          <td>{{ object.stats.year.completions }} / {{ object.stats.year.days }}</td>
+          <td>{% if object.completed_today == object.is_bad %}❌{% else %}✅{% endif %}</td>
+          <td>{{ stats.week.completions }} / {{ stats.week.days }}</td>
+          <td>{{ stats.month.completions }} / {{ stats.month.days }}</td>
+          <td>{{ stats.year.completions }} / {{ stats.year.days }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Longest Streak</th>
+          <th>Current Streak</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
           <td>{{ object.longest_streak }}</td>
           <td>{{ object.current_streak }}</td>
         </tr>

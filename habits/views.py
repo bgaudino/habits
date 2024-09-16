@@ -93,3 +93,8 @@ class HabitCreateView(LoginRequiredMixin, CreateView):
 class HabitDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return self.request.user.habit_set
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stats'] = self.object.stats
+        return context
