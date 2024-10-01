@@ -35,6 +35,10 @@ def streaks_from_completions(completion_dates):
     return completed_streaks, missed_streaks
 
 
+def get_day(num_days_ago):
+    return datetime.today().date() - timedelta(days=num_days_ago)
+
+
 class StatsTestCase(TestCase):
     def setUp(self):
         user = User.objects.create(email='user@test.com')
@@ -42,14 +46,14 @@ class StatsTestCase(TestCase):
             user=user,
             name='Good Habit',
         )
-        self.good_habit.date_created = self.get_day(20)
+        self.good_habit.date_created = get_day(20)
         self.good_habit.save()
         self.bad_habit = models.Habit.objects.create(
             user=user,
             name='Bad Habit',
             is_bad=True,
         )
-        self.bad_habit.date_created = self.get_day(20)
+        self.bad_habit.date_created = get_day(20)
         self.bad_habit.save()
         for days in [
             1, 2, 3,
@@ -59,11 +63,11 @@ class StatsTestCase(TestCase):
         ]:
             models.Completion.objects.create(
                 habit=self.good_habit,
-                date=self.get_day(days),
+                date=get_day(days),
             )
             models.Completion.objects.create(
                 habit=self.bad_habit,
-                date=self.get_day(days),
+                date=get_day(days),
             )
 
     def get_day(self, num_days_ago):
@@ -88,13 +92,55 @@ class StatsTestCase(TestCase):
         models.Completion.objects.all().delete()
         models.Completion.objects.create(
             habit=self.bad_habit,
-            date=self.get_day(4)
+            date=get_day(4)
         )
         self.assertEqual(self.bad_habit.current_streak, 3)
 
     def test_current_streak_good_habit_completed_today(self):
         models.Completion.objects.create(
             habit=self.good_habit,
-            date=self.get_day(0),
+            date=get_day(0),
         )
         self.assertEqual(self.good_habit.current_streak, 4)
+
+
+class QuickStatsTestCase(TestCase):
+    def setUp(self):
+        user = User.objects.create(email='user@test.com')
+        self.bad_habit = models.Habit.objects.create(
+            user=user,
+            name='Bad Habit',
+            is_bad=True,
+        )
+        self.bad_habit.date_created = get_day(20)
+        self.bad_habit.save()
+        for days in [
+            4
+        ]:
+            models.Completion.objects.create(
+                habit=self.bad_habit,
+                date=get_day(days),
+            )
+
+    def test_bad_habit_streak(self):
+        streak, completed_today = self.bad_habit.quick_stats
+        self.assertEqual(streak, 3)
+        self.assertFalse(completed_today)
+
+    def test_bad_habit_streak_completed_yesterday(self):
+        models.Completion.objects.create(
+            habit=self.bad_habit,
+            date=get_day(1),
+        )
+        streak, completed_today = self.bad_habit.quick_stats
+        self.assertEqual(streak, 0)
+        self.assertFalse(completed_today)
+
+    def test_bad_habit_streak_completed_today(self):
+        models.Completion.objects.create(
+            habit=self.bad_habit,
+            date=get_day(0),
+        )
+        streak, completed_today = self.bad_habit.quick_stats
+        self.assertEqual(streak, 0)
+        self.assertTrue(completed_today)

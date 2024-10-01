@@ -141,7 +141,7 @@ class Habit(models.Model):
         stats['completed_yesterday'] = completed_yesterday
         current_streak = 0
         if self.is_bad:
-            if not completed_today or completed_yesterday:
+            if not (completed_today or completed_yesterday):
                 current_streak = missed_streaks[0] if missed_streaks else 0
         else:
             if completed_today:
@@ -163,8 +163,10 @@ class Habit(models.Model):
         completed_today = completion and completion.date == today
         if self.is_bad:
             start = completion.date if completion else self.date_created
-            streak = (today - start).days
-            return streak - 1, completed_today
+            if not completed_today:
+                yesterday = today - timezone.timedelta(days=1)
+                streak = (yesterday - start).days
+            return streak, completed_today
 
         last_date = None
         for completion in self.completion_set.all():
